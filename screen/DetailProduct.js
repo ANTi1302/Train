@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Image, TouchableOpacity } from 'react-native';
 import { Icons } from '../constant';
 
-function FiveActivity({ route, navigation }) {
+function DetailProduct({ route, navigation }) {
   const { image, name, moTa, soLuong } = route.params || {};
 
   return (
@@ -117,4 +117,4 @@ function FiveActivity({ route, navigation }) {
   );
 }
 
-export default FiveActivity;
+export default DetailProduct;
