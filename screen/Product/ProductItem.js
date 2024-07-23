@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, View, Image, Button } from 'react-native';
 
 function ProductItem({ navigation, data = {} }) {
-  const { image, name, moTa, soLuong } = data;
+  const {key, image, name, moTa, soLuong } = data;
 
   if (!data) {
     return (
@@ -14,6 +14,7 @@ function ProductItem({ navigation, data = {} }) {
 
   return (
     <View style={{ flexDirection: 'row', padding: 10, alignItems: 'center' }}>
+    <Text style={{paddingRight:10}}>{key}</Text>
       <Image source={image} style={{ width: 50, height: 50 }} />
       <View style={{ flexDirection: 'column', padding: 5 }}>
         <Text>{name}</Text>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity } from 'react-native';
+import { View, Text, Image, TouchableOpacity, Button } from 'react-native';
 import { Icons } from '../constant';
 
 function DetailProduct({ route, navigation }) {
@@ -99,10 +99,11 @@ function DetailProduct({ route, navigation }) {
             {moTa}
           </Text>
         </View>
-        <View style={{ flex: 15, flexDirection: 'row', backgroundColor: 'white', padding: 15 }}>
+        <View style={{ flexDirection:'column'}}>
+        <View style={{ backgroundColor: 'white', padding: 15 }}>
           <TouchableOpacity
             style={{
-              backgroundColor: 'red',
+              backgroundColor: 'blue',
               height: 40,
               width: '100%',
               alignItems: 'center',
@@ -111,6 +112,24 @@ function DetailProduct({ route, navigation }) {
           >
             <Text style={{ color: 'white', fontSize: 18 }}> TIẾN HÀNH ĐẶT HÀNG</Text>
           </TouchableOpacity>
+          <Button
+          color="red"
+            style={{
+              
+              height: 40,
+              width: '100%',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+            title='QUAY LẠI'
+            onPress={() => {
+          console.log('Button pressed');
+          navigation.navigate('Home');
+        }}
+          >
+           
+          </Button>
+        </View>
         </View>
       </View>
     </View>
