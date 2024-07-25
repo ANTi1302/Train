@@ -17,35 +17,8 @@ const db = SQLite.openDatabase(
 );
 
 function CartFlatlist({ navigation,onDelete }) {
-  const [products, setProducts] = useState([]);  
-  const [productsOrigin, setProductsOrigin] = useState([]);
+  const [products, setProducts] = useState([]); 
   const [refresh, setRefresh] = useState(false);
- 
-  // useEffect(() => {
-  //   if(!products || !products.length) return;
-  //   const listCart = products.map((p) => p.productId).join(',');
-  //   console.log('----------------------');    
-  //   console.log(JSON.parse(JSON.stringify(products)));
-  //   console.log('----------------------');    
-
-  //   db.transaction(tx => {
-  //     tx.executeSql(
-  //       `SELECT * FROM Products WHERE id IN (?)`,
-  //       [listCart],
-  //       (tx, results) => {
-  //         if(results.rows){
-  //           console.log(JSON.parse(JSON.stringify(results.rows)));
-  //           setProductsOrigin([...results.rows]);
-  //         } else {
-  //           setProductsOrigin([]);
-  //         }
-  //       },
-  //       error => {
-  //         console.error('Error fetching data: ', error);
-  //       }
-  //     );
-  //   });
-  // }, [products]);
 
   const fetchProductCart = () => {
     db.transaction(tx => {

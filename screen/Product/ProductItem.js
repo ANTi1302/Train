@@ -16,7 +16,7 @@ const db = SQLite.openDatabase(
   }
 );
 
-function ProductItem({ navigation, data = {} ,onDelete }) {
+function ProductItem({ navigation, data = {}, onDelete }) {
   const { id, image, name, moTa, soLuong} = data;
   const { productId, quantity} = data;
   const [visible, setIsVisible] = useState(false);
@@ -24,6 +24,7 @@ function ProductItem({ navigation, data = {} ,onDelete }) {
   const [videoVisible, setVideoVisible] = useState(false);
   const [videoUri, setVideoUri] = useState('');
   const [quantityUpdate, setQuantityUpdate] = useState(quantity);
+  const [soLuongTonKho, setsoLuongTonKho] = useState(0);
 
   
   let mediaItems;
@@ -91,7 +92,6 @@ function ProductItem({ navigation, data = {} ,onDelete }) {
           }
           console.log('Chạy lại khi nhấn nút xóa')
           if (onDelete) {
-            console.log('Callback ???c g?i!')
             onDelete(); // Call the onDelete callback to refresh the FlatList
           }
           setCartItems(items);
@@ -104,8 +104,6 @@ function ProductItem({ navigation, data = {} ,onDelete }) {
     });
   };
 
-
-  
 
   const handleDelete = (id) => {
     console.log('Attempting to delete item with id:', id);
@@ -130,32 +128,52 @@ function ProductItem({ navigation, data = {} ,onDelete }) {
       );
     });
   };
-  
-  const updateQuantity = (productId, newQuantity) => {
-    // if (newQuantity < 1 || product.soLuong < newQuantity) return;    
+   
+  const updateQuantity = (cartId, newQuantity) => {
     if (newQuantity < 1) return;
-
-
-    db.transaction(tx => {
-      tx.executeSql(
-        `UPDATE cart SET quantity = ? WHERE id = ?;`,
-        [newQuantity, productId],
-        (tx, results) => {
-          if (results.rowsAffected > 0) {
-            console.log('Quantity updated successfully');
-            fetchCartItems();
-
-            setQuantityUpdate(newQuantity);
-          } else {
-            console.log('Failed to update quantity for product with id:', productId);
+    let isError = false;
+  
+    if (productId) {
+      db.transaction(tx => {
+        tx.executeSql(
+          `SELECT * FROM Products WHERE id = ?;`,
+          [productId],
+          (tx, results) => {
+            if (results.rows) {
+              const stockQuantity = results.rows.item(0).soLuong;
+              isError = newQuantity > stockQuantity;
+              setsoLuongTonKho(stockQuantity); // Update state
+              if (isError || stockQuantity < newQuantity) return; // Check immediately after setting state
+  
+              // Proceed with quantity update only if valid
+              db.transaction(tx => {
+                tx.executeSql(
+                  `UPDATE cart SET quantity = ? WHERE id = ?;`,
+                  [newQuantity, cartId],
+                  (tx, results) => {
+                    if (results.rowsAffected > 0) {
+                      console.log('Quantity updated successfully');
+                      fetchCartItems();
+                      setQuantityUpdate(newQuantity);
+                    } else {
+                      console.log('Failed to update quantity for product with id:', cartId);
+                    }
+                  },
+                  error => {
+                    console.error('Error updating quantity:', error);
+                  }
+                );
+              });
+            }
+          },
+          error => {
+            console.error('Error fetching data: ', error);
           }
-        },
-        error => {
-          console.error('Error updating quantity:', error);
-        }
-      );
-    });
+        );
+      });
+    }
   };
+  
 
   return (
     <View style={{ flexDirection: 'row', padding: 10, alignItems: 'center' }}>
@@ -171,15 +189,15 @@ function ProductItem({ navigation, data = {} ,onDelete }) {
       <View style={{ flexDirection: 'column', padding: 5 }}>
         <Text>{name}</Text>
         <Text style={{ color: 'red', paddingTop: 10 }}>{moTa}</Text>
-        {quantity? 
+        {quantity ? 
         <View style={{flexDirection:'row'}}> 
         <TouchableOpacity style={{ height: 25, width: 25, backgroundColor: 'gray', alignItems: 'center', justifyContent: 'center' }} onPress={() => updateQuantity(id, quantity - 1)}>
                 <Text>-</Text>
-        </TouchableOpacity>
+            </TouchableOpacity>
               <Text style={{ marginHorizontal: 15 }}>{quantityUpdate}</Text>
               <TouchableOpacity style={{ height: 25, width: 25, backgroundColor: 'gray', alignItems: 'center', justifyContent: 'center' }} onPress={() => updateQuantity(id, quantity + 1)}>
                 <Text>+</Text>
-              </TouchableOpacity></View>
+            </TouchableOpacity></View>
               :
               <View>
               <Text style={{ color: 'red', paddingTop: 10 }}>SL:{soLuong}</Text>
@@ -195,7 +213,7 @@ function ProductItem({ navigation, data = {} ,onDelete }) {
            
           handleDelete(id)
           }else{
-            navigation.navigate('Details', { image, name, moTa, soLuong });
+            navigation.navigate('Details', {id, image, name, moTa, soLuong });
           }
         }}
         

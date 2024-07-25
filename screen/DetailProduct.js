@@ -17,7 +17,7 @@ const db = SQLite.openDatabase(
   }
 );
 
-const addToCart = (productId, name, quantity, image, moTa) => {
+const addToCart = (productId, name, quantity, image, moTa) => { 
   db.transaction(tx => {
     tx.executeSql(
       `INSERT INTO cart (productId, name, quantity, image, moTa) VALUES (?, ?, ?, ?, ?)`,
@@ -39,7 +39,8 @@ function DetailProduct({ route, navigation }) {
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [videoVisible, setVideoVisible] = useState(false);
   const [videoUri, setVideoUri] = useState('');
-  const [quantity, setQuantity] = useState(route.params?.soLuong || 1);
+  const [quantity, setQuantity] = useState( 1);
+  const [soLuongTonKho, setsoLuongTonKho] = useState(route.params.soLuong);
 let mediaItems;
   try {
     mediaItems = JSON.parse(image);
@@ -86,7 +87,10 @@ let mediaItems;
       }
     });
   };
-  const handleIncrement = () => setQuantity(prev => prev + 1);
+  const handleIncrement = () => {
+    if(soLuongTonKho<= quantity)return;
+    setQuantity(prev => prev+1)
+  };
   const handleDecrement = () => {
     if (quantity > 1) {
       setQuantity(prev => prev - 1);
